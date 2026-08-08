@@ -1,0 +1,283 @@
+{
+  "version": 1,
+  "scenes": {
+    "坐坐": {
+      "kind": "static",
+      "path": "static/坐坐.png",
+      "width": 988,
+      "height": 876,
+      "animation": {
+        "kind": "animation",
+        "frames": [
+          "animations/坐坐/00.png",
+          "animations/坐坐/01.png",
+          "animations/坐坐/02.png",
+          "animations/坐坐/03.png",
+          "animations/坐坐/04.png",
+          "animations/坐坐/05.png",
+          "animations/坐坐/06.png",
+          "animations/坐坐/07.png"
+        ],
+        "durations": [
+          250,
+          250,
+          250,
+          250,
+          250,
+          250,
+          250,
+          250
+        ],
+        "width": 987,
+        "height": 877
+      }
+    },
+    "拍照": {
+      "kind": "static",
+      "path": "static/拍照.png",
+      "width": 924,
+      "height": 676,
+      "animation": {
+        "kind": "animation",
+        "frames": [
+          "animations/拍照/00.png",
+          "animations/拍照/01.png",
+          "animations/拍照/02.png",
+          "animations/拍照/03.png",
+          "animations/拍照/04.png"
+        ],
+        "durations": [
+          250,
+          250,
+          250,
+          250,
+          250
+        ],
+        "width": 929,
+        "height": 701
+      }
+    },
+    "探险": {
+      "kind": "static",
+      "path": "static/探险.png",
+      "width": 729,
+      "height": 1003,
+      "animation": {
+        "kind": "animation",
+        "frames": [
+          "animations/探险/00.png",
+          "animations/探险/01.png",
+          "animations/探险/02.png",
+          "animations/探险/03.png"
+        ],
+        "durations": [
+          250,
+          250,
+          250,
+          250
+        ],
+        "width": 760,
+        "height": 1018
+      }
+    },
+    "海边": {
+      "kind": "static",
+      "path": "static/海边.png",
+      "width": 980,
+      "height": 912,
+      "animation": {
+        "kind": "animation",
+        "frames": [
+          "animations/海边/00.png",
+          "animations/海边/01.png",
+          "animations/海边/02.png",
+          "animations/海边/03.png",
+          "animations/海边/04.png",
+          "animations/海边/05.png",
+          "animations/海边/06.png",
+          "animations/海边/07.png"
+        ],
+        "durations": [
+          250,
+          250,
+          250,
+          250,
+          250,
+          250,
+          250,
+          250
+        ],
+        "width": 1017,
+        "height": 912
+      }
+    },
+    "潜水": {
+      "kind": "static",
+      "path": "static/潜水.png",
+      "width": 1899,
+      "height": 1518,
+      "animation": {
+        "kind": "animation",
+        "frames": [
+          "animations/潜水/00.png",
+          "animations/潜水/01.png",
+          "animations/潜水/02.png",
+          "animations/潜水/03.png",
+          "animations/潜水/04.png",
+          "animations/潜水/05.png"
+        ],
+        "durations": [
+          250,
+          250,
+          250,
+          250,
+          250,
+          250
+        ],
+        "width": 977,
+        "height": 815
+      }
+    },
+    "看书": {
+      "kind": "static",
+      "path": "static/看书.png",
+      "width": 923,
+      "height": 609,
+      "animation": {
+        "kind": "animation",
+        "frames": [
+          "animations/看书/00.png",
+          "animations/看书/01.png",
+          "animations/看书/02.png",
+          "animations/看书/03.png",
+          "animations/看书/04.png",
+          "animations/看书/05.png",
+          "animations/看书/06.png"
+        ],
+        "durations": [
+          250,
+          250,
+          250,
+          250,
+          250,
+          250,
+          250
+        ],
+        "width": 981,
+        "height": 616
+      }
+    },
+    "纸飞机": {
+      "kind": "static",
+      "path": "static/纸飞机.png",
+      "width": 955,
+      "height": 714,
+      "animation": {
+        "kind": "animation",
+        "frames": [
+          "animations/纸飞机/00.png",
+          "animations/纸飞机/01.png",
+          "animations/纸飞机/02.png",
+          "animations/纸飞机/03.png",
+          "animations/纸飞机/04.png"
+        ],
+        "durations": [
+          200,
+          200,
+          200,
+          200,
+          200
+        ],
+        "width": 963,
+        "height": 768
+      }
+    },
+    "购物": {
+      "kind": "static",
+      "path": "static/购物.png",
+      "width": 874,
+      "height": 918,
+      "animation": {
+        "kind": "animation",
+        "frames": [
+          "animations/购物/00.png",
+          "animations/购物/01.png",
+          "animations/购物/02.png",
+          "animations/购物/03.png",
+          "animations/购物/04.png",
+          "animations/购物/05.png",
+          "animations/购物/06.png",
+          "animations/购物/07.png"
+        ],
+        "durations": [
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200,
+          200
+        ],
+        "width": 1018,
+        "height": 964
+      }
+    },
+    "送货": {
+      "kind": "static",
+      "path": "static/送货.png",
+      "width": 831,
+      "height": 728,
+      "animation": {
+        "kind": "animation",
+        "frames": [
+          "animations/送货/00.png",
+          "animations/送货/01.png",
+          "animations/送货/02.png",
+          "animations/送货/03.png",
+          "animations/送货/04.png"
+        ],
+        "durations": [
+          170,
+          170,
+          170,
+          170,
+          170
+        ],
+        "width": 972,
+        "height": 817
+      }
+    },
+    "骑行": {
+      "kind": "static",
+      "path": "static/骑行.png",
+      "width": 983,
+      "height": 625,
+      "animation": {
+        "kind": "animation",
+        "frames": [
+          "animations/骑行/00.png",
+          "animations/骑行/01.png",
+          "animations/骑行/02.png",
+          "animations/骑行/03.png",
+          "animations/骑行/04.png"
+        ],
+        "durations": [
+          200,
+          200,
+          200,
+          200,
+          200
+        ],
+        "width": 1005,
+        "height": 686
+      }
+    },
+    "办公": {
+      "kind": "static",
+      "path": "static/办公.png",
+      "width": 1040,
+      "height": 1075
+    }
+  }
+}
