@@ -1,0 +1,13 @@
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+build/
+dist/
+release/
+tmp/
+*.log
+.env
+.env.*
+!.env.example
+settings.ini
