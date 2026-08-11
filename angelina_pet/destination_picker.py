@@ -16,6 +16,7 @@ class DestinationPicker(QWidget):
         self._active = False
         self._cursor_pos = QPoint()
         self._hint_center = QPoint()
+        self._hint_text = "点击桌面选择目的地  ·  Esc 取消"
 
         self.setAttribute(Qt.WA_TranslucentBackground)
         self.setAttribute(Qt.WA_NoSystemBackground)
@@ -35,7 +36,7 @@ class DestinationPicker(QWidget):
             self.show()
             self.raise_()
 
-    def show_picker(self, anchor_point: QPoint | None = None) -> None:
+    def show_picker(self, anchor_point: QPoint | None = None, hint_text: str | None = None) -> None:
         """Cover the virtual desktop and begin selecting a destination.
 
         ``anchor_point`` is a global coordinate used as the initial reticle
@@ -48,6 +49,7 @@ class DestinationPicker(QWidget):
 
         virtual = primary.virtualGeometry()
         global_anchor = QPoint(anchor_point) if anchor_point is not None else QCursor.pos()
+        self._hint_text = (hint_text or "点击桌面选择目的地  ·  Esc 取消").strip()
         screen = QApplication.screenAt(global_anchor) or primary
         screen_geometry = screen.availableGeometry()
 
@@ -146,7 +148,7 @@ class DestinationPicker(QWidget):
         font.setBold(True)
         painter.setFont(font)
         painter.setPen(QColor(91, 68, 79, 245))
-        painter.drawText(hint, Qt.AlignCenter, "点击桌面选择目的地  ·  Esc 取消")
+        painter.drawText(hint, Qt.AlignCenter, self._hint_text)
 
         center = QPointF(self._cursor_pos)
         painter.setBrush(Qt.NoBrush)

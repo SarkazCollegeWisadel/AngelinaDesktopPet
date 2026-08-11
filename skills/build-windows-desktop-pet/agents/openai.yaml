@@ -1,0 +1,4 @@
+interface:
+  display_name: "Windows 桌宠复现工坊"
+  short_description: "从角色图片生成带动画、AI 对话与办公彩蛋的 Windows 桌宠"
+  default_prompt: "使用 $build-windows-desktop-pet 根据我的角色图片和临时测试 API Key 创建 Windows 桌宠。"

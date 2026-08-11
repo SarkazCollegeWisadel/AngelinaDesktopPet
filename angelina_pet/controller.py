@@ -85,6 +85,7 @@ class PetController:
         self.ai = AIService()
         self.keyboard = KeyboardHook()
         self.destination_picker = DestinationPicker(True)
+        self._picker_mode: str | None = None
         self.chat: MiniChatDialog | None = None
         self.chat_history: list[dict[str, str]] = []
 
@@ -108,7 +109,11 @@ class PetController:
         self.key_times: deque[float] = deque(maxlen=32)
         self.last_key_time = 0.0
         self.office_manual = False
-        self.leash_anchor = QPointF()
+        self.leash_anchor: QPointF | None = (
+            QPointF(self.settings.leash_anchor_x, self.settings.leash_anchor_y)
+            if self.settings.leash_anchor_saved
+            else None
+        )
         self.leash_radius = 220.0
         self._pending_vision_screen = None
         self._pending_vision_request_id: str | None = None
@@ -146,7 +151,8 @@ class PetController:
         self.keyboard.key_pressed.connect(self._on_key_pressed)
         self.keyboard.error.connect(self.say)
         self.bubble.clicked.connect(self.open_chat)
-        self.destination_picker.selected.connect(self._travel_to)
+        self.destination_picker.selected.connect(self._on_destination_selected)
+        self.destination_picker.cancelled.connect(self._on_destination_cancelled)
         self.ai.completed.connect(self._on_ai_completed)
         self.ai.failed.connect(self._on_ai_failed)
 
@@ -189,10 +195,11 @@ class PetController:
         reading_action.triggered.connect(self._toggle_reading)
         destination_action = menu.addAction("让她去指定地点…")
         destination_action.triggered.connect(self._choose_destination)
-        leash_action = menu.addAction("系上小链子")
-        leash_action.setCheckable(True)
-        leash_action.setChecked(self.settings.leash)
-        leash_action.toggled.connect(self._enable_leash)
+        leash_action = menu.addAction("重新选择小链子固定点…" if self.settings.leash else "系到指定地点…")
+        leash_action.triggered.connect(self._choose_leash_anchor)
+        if self.settings.leash:
+            remove_leash_action = menu.addAction("收起小链子")
+            remove_leash_action.triggered.connect(lambda: self._enable_leash(False))
 
         free_walk = menu.addAction("自由走动")
         free_walk.setCheckable(True)
@@ -437,7 +444,31 @@ class PetController:
 
     def _choose_destination(self) -> None:
         self._touch()
-        self.destination_picker.show_picker(self.pet.geometry().center())
+        self._picker_mode = "travel"
+        self.destination_picker.show_picker(
+            self.pet.geometry().center(),
+            "点击桌面选择她要去的地点  ·  Esc 取消",
+        )
+
+    def _choose_leash_anchor(self) -> None:
+        self._touch()
+        self._picker_mode = "leash"
+        initial = self.leash_anchor.toPoint() if self.leash_anchor is not None else self.pet.geometry().center()
+        self.destination_picker.show_picker(
+            initial,
+            "点击桌面选择小链子的固定点  ·  Esc 取消",
+        )
+
+    def _on_destination_selected(self, point: QPoint) -> None:
+        picker_mode = self._picker_mode or "travel"
+        self._picker_mode = None
+        if picker_mode == "leash":
+            self._set_leash_anchor(point)
+            return
+        self._travel_to(point)
+
+    def _on_destination_cancelled(self) -> None:
+        self._picker_mode = None
 
     def _travel_to(self, point: QPoint) -> None:
         screen = QApplication.screenAt(point) or QApplication.primaryScreen()
@@ -462,7 +493,7 @@ class PetController:
         self.say(random.choice(("好，目的地记住啦。", "收到，这就出发~", "路线确认，交给我吧。")))
 
     def _limit_destination_to_leash(self, pos: QPointF) -> QPointF:
-        if not self.settings.leash or self.leash_anchor.isNull():
+        if not self.settings.leash or self.leash_anchor is None:
             return pos
         center = QPointF(pos.x() + self.pet.width() / 2, pos.y() + self.pet.height() * 0.65)
         delta = center - self.leash_anchor
@@ -540,16 +571,35 @@ class PetController:
     def _enable_leash(self, enabled: bool) -> None:
         self.settings.leash = bool(enabled)
         if enabled:
-            rect = self.pet.geometry()
-            self.leash_anchor = QPointF(rect.center().x() - min(140, rect.width() * 0.45), rect.bottom() - 10)
+            if self.leash_anchor is None:
+                rect = self.pet.geometry()
+                self.leash_anchor = QPointF(rect.center().x() - min(140, rect.width() * 0.45), rect.bottom() - 10)
+                self._remember_leash_anchor()
             self._update_tether()
             self.pet.raise_()
         else:
             self.tether.hide()
         self._save_settings()
 
+    def _set_leash_anchor(self, point: QPoint) -> None:
+        self.leash_anchor = QPointF(point)
+        self.settings.leash = True
+        self._remember_leash_anchor()
+        self._save_settings()
+        self._update_tether()
+        self.pet.raise_()
+        self._travel_to(point)
+        self.say("固定点选好啦，我过去就不会跑太远~")
+
+    def _remember_leash_anchor(self) -> None:
+        if self.leash_anchor is None:
+            return
+        self.settings.leash_anchor_saved = True
+        self.settings.leash_anchor_x = round(self.leash_anchor.x())
+        self.settings.leash_anchor_y = round(self.leash_anchor.y())
+
     def _update_tether(self) -> None:
-        if not self.settings.leash or self.leash_anchor.isNull():
+        if not self.settings.leash or self.leash_anchor is None:
             return
         rect = self.pet.geometry()
         target = QPointF(rect.center().x(), rect.center().y() + rect.height() * 0.22)
@@ -559,7 +609,7 @@ class PetController:
             self.chat.raise_()
 
     def _apply_leash(self, pos: QPointF) -> QPointF:
-        if not self.settings.leash or self.leash_anchor.isNull():
+        if not self.settings.leash or self.leash_anchor is None:
             return pos
         center = QPointF(pos.x() + self.pet.width() / 2, pos.y() + self.pet.height() * 0.65)
         delta = center - self.leash_anchor

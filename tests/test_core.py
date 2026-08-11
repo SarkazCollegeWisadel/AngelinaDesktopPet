@@ -415,6 +415,66 @@ class NewWidgetTests(unittest.TestCase):
         self.assertFalse(picker.isVisible())
         picker.close()
 
+    def test_destination_picker_accepts_context_specific_hint(self) -> None:
+        picker = DestinationPicker(topmost=False)
+        anchor = QApplication.primaryScreen().availableGeometry().center()
+        picker.show_picker(anchor, "点击选择链子固定点")
+        APP.processEvents()
+        self.assertEqual(picker._hint_text, "点击选择链子固定点")
+        picker._cancel()
+        picker.close()
+
+    def test_leash_anchor_selection_is_saved_and_starts_travel(self) -> None:
+        class FakePet:
+            raised = 0
+
+            def raise_(self) -> None:
+                self.raised += 1
+
+        controller = PetController.__new__(PetController)
+        controller.settings = AppSettings()
+        controller.pet = FakePet()
+        controller.leash_anchor = None
+        updates: list[bool] = []
+        saves: list[bool] = []
+        travelled: list[QPoint] = []
+        said: list[str] = []
+        controller._update_tether = lambda: updates.append(True)
+        controller._save_settings = lambda: saves.append(True)
+        controller._travel_to = lambda point: travelled.append(QPoint(point))
+        controller.say = said.append
+
+        chosen = QPoint(-120, 460)
+        controller._set_leash_anchor(chosen)
+
+        self.assertTrue(controller.settings.leash)
+        self.assertTrue(controller.settings.leash_anchor_saved)
+        self.assertEqual(controller.settings.leash_anchor_x, -120)
+        self.assertEqual(controller.settings.leash_anchor_y, 460)
+        self.assertEqual(controller.leash_anchor, QPointF(chosen))
+        self.assertEqual(travelled, [chosen])
+        self.assertEqual(len(updates), 1)
+        self.assertEqual(len(saves), 1)
+        self.assertTrue(said)
+
+    def test_picker_dispatches_leash_and_travel_separately(self) -> None:
+        controller = PetController.__new__(PetController)
+        leash_points: list[QPoint] = []
+        travel_points: list[QPoint] = []
+        controller._set_leash_anchor = lambda point: leash_points.append(QPoint(point))
+        controller._travel_to = lambda point: travel_points.append(QPoint(point))
+
+        controller._picker_mode = "leash"
+        controller._on_destination_selected(QPoint(20, 30))
+        self.assertEqual(leash_points, [QPoint(20, 30)])
+        self.assertEqual(travel_points, [])
+        self.assertIsNone(controller._picker_mode)
+
+        controller._picker_mode = "travel"
+        controller._on_destination_selected(QPoint(80, 90))
+        self.assertEqual(travel_points, [QPoint(80, 90)])
+        self.assertIsNone(controller._picker_mode)
+
     def test_mini_chat_keeps_only_two_recent_rounds_and_follows_pet(self) -> None:
         chat = MiniChatDialog()
         self.assertTrue(chat.windowFlags() & Qt.WindowStaysOnTopHint)
@@ -454,12 +514,19 @@ class PeriodicVisionTests(unittest.TestCase):
                 vision_periodic_enabled=True,
                 vision_interval_minutes=1,
                 vision_api_key="temporary-test-key",
+                leash=True,
+                leash_anchor_saved=True,
+                leash_anchor_x=-320,
+                leash_anchor_y=720,
             )
             store.save(value)
             loaded = store.load()
             self.assertTrue(loaded.vision_periodic_enabled)
             self.assertEqual(loaded.vision_interval_minutes, 5)
             self.assertEqual(loaded.vision_api_key, "temporary-test-key")
+            self.assertTrue(loaded.leash)
+            self.assertTrue(loaded.leash_anchor_saved)
+            self.assertEqual((loaded.leash_anchor_x, loaded.leash_anchor_y), (-320, 720))
 
             value.vision_interval_minutes = 999
             store.save(value)
