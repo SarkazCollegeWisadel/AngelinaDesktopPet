@@ -23,6 +23,9 @@ class AppSettings:
     always_on_top: bool = True
     free_walk: bool = True
     leash: bool = False
+    leash_anchor_saved: bool = False
+    leash_anchor_x: int = 0
+    leash_anchor_y: int = 0
     keyboard_reaction: bool = True
     idle_nudges: bool = True
     autostart: bool = False
@@ -51,6 +54,9 @@ class SettingsStore:
             always_on_top=self._bool(s.value("pet/always_on_top", True)),
             free_walk=self._bool(s.value("behavior/free_walk", True)),
             leash=self._bool(s.value("behavior/leash", False)),
+            leash_anchor_saved=self._bool(s.value("behavior/leash_anchor_saved", False)),
+            leash_anchor_x=int(s.value("behavior/leash_anchor_x", 0)),
+            leash_anchor_y=int(s.value("behavior/leash_anchor_y", 0)),
             keyboard_reaction=self._bool(s.value("behavior/keyboard_reaction", True)),
             idle_nudges=self._bool(s.value("behavior/idle_nudges", True)),
             autostart=self._bool(s.value("system/autostart", False)),
@@ -74,6 +80,9 @@ class SettingsStore:
         s.setValue("pet/always_on_top", value.always_on_top)
         s.setValue("behavior/free_walk", value.free_walk)
         s.setValue("behavior/leash", value.leash)
+        s.setValue("behavior/leash_anchor_saved", value.leash_anchor_saved)
+        s.setValue("behavior/leash_anchor_x", value.leash_anchor_x)
+        s.setValue("behavior/leash_anchor_y", value.leash_anchor_y)
         s.setValue("behavior/keyboard_reaction", value.keyboard_reaction)
         s.setValue("behavior/idle_nudges", value.idle_nudges)
         s.setValue("system/autostart", value.autostart)
