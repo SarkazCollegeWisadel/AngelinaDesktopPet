@@ -55,7 +55,9 @@ DeepSeek 兼容配置示例：
 .\build.ps1
 ```
 
-脚本会创建 `.venv`、安装依赖、处理透明动画、运行测试、生成 `dist/AngelinaDesktopPet/AngelinaDesktopPet.exe`，并输出 `release/AngelinaDesktopPet-Windows-x64.zip`。
+脚本会创建 `.venv`、安装依赖、处理透明动画、运行测试，并输出单文件 `release/AngelinaDesktopPet.exe`。
+
+推送 `v*` 标签后，GitHub Actions 会自动构建 Windows 单文件程序，并把 `AngelinaDesktopPet.exe` 直接附加到对应的 GitHub Release。
 
 开发模式：
 
