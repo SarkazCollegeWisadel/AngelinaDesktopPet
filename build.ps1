@@ -1,17 +1,20 @@
 param(
-    [switch]$SkipInstall
+    [switch]$SkipInstall,
+    [string]$PythonExecutable
 )
 
 $ErrorActionPreference = 'Stop'
 $ProjectRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
-$BundledPython = 'C:\Users\Im1ssu\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe'
 $VenvPython = Join-Path $ProjectRoot '.venv\Scripts\python.exe'
 
 if (-not (Test-Path -LiteralPath $VenvPython)) {
-    if (-not (Test-Path -LiteralPath $BundledPython)) {
-        throw 'Python was not found. Install Python 3.11+ or update BundledPython in build.ps1.'
+    if (-not $PythonExecutable) {
+        $PythonExecutable = (Get-Command python -ErrorAction SilentlyContinue).Source
     }
-    & $BundledPython -m venv (Join-Path $ProjectRoot '.venv')
+    if (-not $PythonExecutable) {
+        throw 'Python was not found. Install Python 3.11+ or pass -PythonExecutable.'
+    }
+    & $PythonExecutable -m venv (Join-Path $ProjectRoot '.venv')
     if ($LASTEXITCODE -ne 0) {
         throw "Virtual environment creation failed with exit code $LASTEXITCODE."
     }
@@ -36,14 +39,8 @@ if ($LASTEXITCODE -ne 0) {
 if ($LASTEXITCODE -ne 0) {
     throw "PyInstaller failed with exit code $LASTEXITCODE. Close the running desktop pet and retry."
 }
-$DistRoot = Join-Path $ProjectRoot 'dist\AngelinaDesktopPet'
-Copy-Item -LiteralPath (Join-Path $ProjectRoot 'README.md') -Destination (Join-Path $DistRoot 'README.md') -Force
-
 $ReleaseDir = Join-Path $ProjectRoot 'release'
 New-Item -ItemType Directory -Force -Path $ReleaseDir | Out-Null
-$ZipPath = Join-Path $ReleaseDir 'AngelinaDesktopPet-Windows-x64.zip'
-if (Test-Path -LiteralPath $ZipPath) {
-    Remove-Item -LiteralPath $ZipPath -Force
-}
-Compress-Archive -Path (Join-Path $DistRoot '*') -DestinationPath $ZipPath -CompressionLevel Optimal
-Write-Host "Build complete: $ZipPath"
+$ReleaseExe = Join-Path $ReleaseDir 'AngelinaDesktopPet.exe'
+Copy-Item -LiteralPath (Join-Path $ProjectRoot 'dist\AngelinaDesktopPet.exe') -Destination $ReleaseExe -Force
+Write-Host "Build complete: $ReleaseExe"
